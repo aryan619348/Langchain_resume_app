@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PDF Upload</title>
+</head>
+
+<body>
+    <h1>PDF Upload Page</h1>
+
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf">
+        <input type="submit" value="Upload">
+    </form>
+
+    <h2>Uploaded Files:</h2>
+    <ul>
+        {% for file in files %}
+        <li>{{ file }} <a href="/delete/{{ file }}">Delete</a></li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>
