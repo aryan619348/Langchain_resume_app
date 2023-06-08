@@ -3,6 +3,97 @@
 
 <head>
     <title>PDF Upload</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 24px;
+        }
+
+        h2 {
+            color: #fff;
+            font-size: 20px;
+            margin-top: 40px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="file"],
+        input[type="url"],
+        input[type="text"] {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        ul {
+            margin-top: 20px;
+            padding-left: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            list-style-type: none;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .chat-container {
+            margin-top: 40px;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .chat-container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #222;
+        }
+
+        .chat-container input[type="submit"] {
+            margin-top: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-container .chat-output {
+            margin-top: 20px;
+            color: #fff;
+        }
+    </style>
 </head>
 
 <body>
@@ -13,12 +104,54 @@
         <input type="submit" value="Upload">
     </form>
 
+    <h2>Job Post Link:</h2>
+    <form method="POST" action="/submit-link">
+        <input type="url" name="job-link" placeholder="Enter job post URL" required>
+        <input type="submit" value="Submit">
+    </form>
+
     <h2>Uploaded Files:</h2>
     <ul>
         {% for file in files %}
         <li>{{ file }} <a href="/delete/{{ file }}">Delete</a></li>
         {% endfor %}
     </ul>
+
+    <div class="chat-container">
+        <h2>Chat:</h2>
+        <form id="chat-form" action="/chat" method="POST">
+            <input type="text" id="chat-input" name="question" placeholder="Ask a question">
+            <input type="submit" value="Send">
+        </form>
+        <div class="chat-output" id="chat-output"></div>
+    </div>
+
+    <script>
+        document.getElementById("chat-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var input = document.getElementById("chat-input").value;
+            var output = document.getElementById("chat-output");
+            var message = "<p><strong>You:</strong> " + input + "</p>";
+            output.innerHTML += message;
+            // Send the user's question to the server for processing
+            // and receive the response
+            fetch("/chat", {
+                method: "POST",
+                body: new URLSearchParams(new FormData(event.target))
+            })
+            .then(function(response) {
+                return response.text();
+            })
+            .then(function(response) {
+                var botReply = "<p><strong>Bot:</strong> " + response + "</p>";
+                output.innerHTML += botReply;
+                document.getElementById("chat-input").value = "";
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
+        });
+    </script>
 </body>
 
 </html>
